@@ -128,6 +128,7 @@
 	__block CDVPluginResult* result = nil;
 
 	NSDictionary* options = [self validateOptions:command];
+    
 
 	if (!options)
 		return;
@@ -162,9 +163,7 @@
 
 			if (settingsValue != nil) {
 				if ([settingsValue isKindOfClass:[NSString class]]) {
-					NSString *escaped = [(NSString*)settingsValue stringByReplacingOccurrencesOfString:@"\\" withString:@"\\\\"];
-					escaped = [escaped stringByReplacingOccurrencesOfString:@"\"" withString:@"\\\""];
-					returnVar = [NSString stringWithFormat:@"\"%@\"", escaped];
+                    		     returnVar = (NSString*)settingsValue;
 				} else if ([settingsValue isKindOfClass:[NSNumber class]]) {
 					if ((NSNumber*)settingsValue == (void*)kCFBooleanFalse || (NSNumber*)settingsValue == (void*)kCFBooleanTrue) {
 						// const char * x = [(NSNumber*)settingsValue objCType];
