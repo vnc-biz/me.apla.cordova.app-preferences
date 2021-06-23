@@ -3,13 +3,13 @@
 module.exports = function (context) {
 	var req = context.requireCordovaModule,
 
-		Q = req('q'),
-		path = req('path'),
-		fs = require("./lib/filesystem")(Q, req('fs'), path),
+		Q = require('q'),
+		path = require('path'),
+		fs = require("./lib/filesystem")(Q, require('fs'), path),
 		settings = require("./lib/settings")(fs, path),
 
 		android = require("./lib/android")(context),
-		ios = require("./lib/ios")(Q, fs, path, req('plist'), req('xcode'));
+		ios = require("./lib/ios")(Q, fs, path, require('plist'), require('xcode'));
 
 	return settings.get()
 		.then(function (config) {

@@ -5,15 +5,15 @@ module.exports = function (context) {
 
 	var
 		req = context ? context.requireCordovaModule : require,
-		Q = req('q'),
-		path = req('path'),
-		ET = req('elementtree'),
-		cordova = req('cordova'),
+		Q = require('q'),
+		path = require('path'),
+		ET = require('elementtree'),
+		cordova = require('cordova'),
 		cordova_lib = cordova.cordova_lib,
 		ConfigParser = cordova_lib.configparser,
 		cordova_util = req('cordova-lib/src/cordova/util'),
-		ofs = req("fs"),
-		fs = require("./filesystem")(Q, req('fs'), path),
+		ofs = require("fs"),
+		fs = require("./filesystem")(Q, require('fs'), path),
 		platforms = {};
 
 	// fs, path, ET, cordova_util, ConfigParser
