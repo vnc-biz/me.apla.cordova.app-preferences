@@ -1,39 +1,36 @@
 'use strict';
 
 module.exports = function (context) {
-	var req = context.requireCordovaModule,
-		Q = req('q'),
-		path = req('path'),
-		ET = req('elementtree'),
-		cordova = req('cordova'),
-		cordova_lib = cordova.cordova_lib,
-		cordova_lib_util = req('cordova-lib/src/cordova/util'),
-		fs = require("./lib/filesystem")(Q, req('fs'), path),
-		settings = require("./lib/settings")(fs, path),
-		platforms = {};
+	var path = require('path'),
+		fs = require('fs'),
+		ET = require('elementtree');
 
-	platforms.android = require("./lib/android")(context);
-	platforms.ios = require("./lib/ios")(Q, fs, path, req('plist'), req('xcode'));
-	// platforms.browser = require("./lib/browser")(Q, fs, path, req('plist'), req('xcode'));
+	var appSettingsPath = path.join(context.opts.projectRoot, 'app-settings.json');
 
-	return settings.get()
-		.then(function (config) {
-			var promises = [];
-			context.opts.platforms.forEach (function (platformName) {
-				if (platforms[platformName] && platforms[platformName].build) {
-					promises.push (platforms[platformName].build (config));
-				}
-			});
-			return Q.all(promises);
-		})
-		.catch(function(err) {
-			if (err.code === 'NEXIST') {
-				console.log("app-settings.json not found: skipping build");
-				return;
-			}
+	if (!fs.existsSync(appSettingsPath)) {
+		console.log("app-settings.json not found: skipping app-preferences build");
+		return Promise.resolve();
+	}
 
-			console.log ('unhandled exception', err);
+	var settings;
+	try {
+		settings = JSON.parse(fs.readFileSync(appSettingsPath, 'utf8'));
+	} catch (e) {
+		console.log("app-settings.json parse error: skipping app-preferences build");
+		return Promise.resolve();
+	}
 
-			throw err;
+	var promises = context.opts.platforms
+		.filter(function (p) { return p === 'android'; })
+		.map(function () {
+			return require('./lib/android')(context).build(settings);
 		});
+
+	return Promise.all(promises).catch(function (err) {
+		if (err && err.code === 'NEXIST') {
+			console.log("Platform not found: skipping app-preferences build");
+			return;
+		}
+		throw err;
+	});
 };

@@ -3,7 +3,7 @@
 <plugin xmlns="http://cordova.apache.org/ns/plugins/1.0"
 	xmlns:android="http://schemas.android.com/apk/res/android"
 	id="cordova-plugin-app-preferences"
-	version="0.99.4">
+	version="1.0.0">
 
 	<name>AppPreferences</name>
 	<description>Application preferences plugin and preference pane generator</description>
@@ -11,6 +11,11 @@
 	<keywords>preferences, settings</keywords>
 	<repo>https://github.com/apla/me.apla.cordova.app-preferences</repo>
 	<issue>https://github.com/apla/me.apla.cordova.app-preferences/issues</issue>
+
+	<engines>
+		<engine name="cordova" version=">=13.0.0" />
+		<engine name="cordova-android" version=">=13.0.0" />
+	</engines>
 
 	<js-module src="www/apppreferences.js" name="apppreferences">
 		<clobbers target="plugins.appPreferences" />
@@ -32,7 +37,7 @@
 			</feature>
 		</config-file>
 		<config-file target="AndroidManifest.xml" parent="/manifest/application">
-			<activity android:name="me.apla.cordova.AppPreferencesActivity" />
+			<activity android:name="me.apla.cordova.AppPreferencesActivity" android:exported="false" />
 		</config-file>
 		<source-file src="src/android/AppPreferences.java" target-dir="src/me/apla/cordova" />
 	</platform>
