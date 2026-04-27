@@ -1,29 +1,29 @@
 'use strict';
 
 module.exports = function (context) {
-	var req = context.requireCordovaModule,
-		Q = req('q'),
-		path = req('path'),
-		fs = require("./lib/filesystem")(Q, req('fs'), path),
-		settings = require("./lib/settings")(fs, path),
-		android = require("./lib/android")(context),
-		ios = require("./lib/ios")(Q, fs, path, req('plist'), req('xcode'));
+	var path = require('path'),
+		fs = require('fs');
 
-	return settings.get()
-		.then(function (config) {
-			return Q.all([
-				android.afterPluginInstall(config),
-				// ios.afterPluginInstall(config) // not implemented for iOS
-			]);
-		})
-		.catch(function(err) {
-			if (err.code === 'NEXIST') {
-				console.log("app-settings.json not found: creating a sample file");
-				return settings.create();
-			}
+	var appSettingsPath = path.join(context.opts.projectRoot, 'app-settings.json');
 
-			console.log ('unhandled exception', err);
+	if (!fs.existsSync(appSettingsPath)) {
+		console.log("app-settings.json not found: skipping after_plugin_install");
+		return Promise.resolve();
+	}
 
-			throw err;
-		});
+	var android = require('./lib/android')(context);
+	var settings;
+	try {
+		settings = JSON.parse(fs.readFileSync(appSettingsPath, 'utf8'));
+	} catch (e) {
+		return Promise.resolve();
+	}
+
+	return android.afterPluginInstall(settings).catch(function (err) {
+		if (err && err.code === 'NEXIST') {
+			console.log("Platform android not found: skipping");
+			return;
+		}
+		throw err;
+	});
 };
